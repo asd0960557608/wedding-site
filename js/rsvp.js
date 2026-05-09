@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!guest.name || !guest.phone || !guest.attend_status) {
       setLoading(spinner, false);
-      showNotice(notice, '請確認姓名、手機與出席狀態都已填寫。', 'error');
+      showNotice(notice, '請確認姓名、手機與參加狀態都已填寫。', 'error');
       return;
     }
 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error) throw error;
 
       form.reset();
-      showNotice(notice, '已收到您的回覆，謝謝您把這一天留給我們。', 'success');
+      showNotice(notice, '已收到您的報名登記，謝謝您把這一天留給我們。', 'success');
     } catch (error) {
       showNotice(notice, `送出時發生問題：${error.message}`, 'error');
     } finally {

@@ -3,7 +3,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const weddingSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-const WEDDING_DATE = new Date('2026-11-21T12:00:00+08:00');
+const WEDDING_DATE = new Date('2027-03-28T12:00:00+08:00');
 
 function setupNavigation() {
   const toggle = document.querySelector('[data-nav-toggle]');
