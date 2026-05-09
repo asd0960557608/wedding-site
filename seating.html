@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>桌次查詢 | Haruto & Aoi Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">Haruto & Aoi<small>Wedding Day</small></a>
+      <button class="nav-toggle" data-nav-toggle aria-label="開啟選單"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">首頁</a>
+        <a href="rsvp.html">RSVP</a>
+        <a class="active" href="seating.html">桌次查詢</a>
+        <a href="guide.html">婚禮指引</a>
+        <a href="admin.html">後台</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="page-title reveal">
+        <span class="eyebrow">Seating</span>
+        <h1>桌次查詢</h1>
+        <p>輸入姓名或手機號碼，即可查詢婚禮當天的桌號與備註。</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <form class="form-panel reveal" id="seatingForm">
+          <div class="search-row">
+            <input id="seatingQuery" type="text" placeholder="請輸入姓名或手機">
+            <button class="btn" type="submit">查詢</button>
+          </div>
+          <div class="form-actions">
+            <span class="spinner" id="seatingSpinner"></span>
+          </div>
+          <div class="notice" id="seatingNotice"></div>
+        </form>
+
+        <article class="result-panel reveal" id="seatingResult">
+          <span class="eyebrow">Table</span>
+          <h2 data-result-name>賓客姓名</h2>
+          <div class="table-no" data-result-table>尚未安排</div>
+          <p>出席狀態：<strong data-result-status>尚未確認</strong></p>
+          <p data-result-note>婚禮當天請依現場接待指引入座。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">See you on our wedding day</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/seating.js"></script>
+</body>
+</html>

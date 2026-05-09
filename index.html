@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haruto & Aoi Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">Haruto & Aoi<small>Wedding Day</small></a>
+      <button class="nav-toggle" data-nav-toggle aria-label="開啟選單"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a class="active" href="index.html">首頁</a>
+        <a href="rsvp.html">RSVP</a>
+        <a href="seating.html">桌次查詢</a>
+        <a href="guide.html">婚禮指引</a>
+        <a href="admin.html">後台</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content reveal">
+        <div class="eyebrow">A quiet promise, a warm celebration</div>
+        <h1>Haruto & Aoi</h1>
+        <div class="hero-date">2026.11.21 Saturday</div>
+        <div class="hero-actions">
+          <a class="btn" href="rsvp.html">填寫 RSVP</a>
+          <a class="btn secondary" href="#details">查看婚禮資訊</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="countdown">
+      <div class="container">
+        <div class="section-title center reveal">
+          <span class="eyebrow">Countdown</span>
+          <h2>距離婚禮還有</h2>
+        </div>
+        <div class="countdown reveal">
+          <div class="count-item"><strong id="days">0</strong><span>Days</span></div>
+          <div class="count-item"><strong id="hours">0</strong><span>Hours</span></div>
+          <div class="count-item"><strong id="minutes">0</strong><span>Minutes</span></div>
+          <div class="count-item"><strong id="seconds">0</strong><span>Seconds</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="details">
+      <div class="container">
+        <div class="section-title reveal">
+          <span class="eyebrow">Information</span>
+          <h2>婚禮資訊</h2>
+          <p>在秋日光線最柔和的時候，邀請你一起見證我們的新生活開端。</p>
+        </div>
+        <div class="info-grid">
+          <article class="info-item reveal">
+            <span>Date</span>
+            <h3>2026 年 11 月 21 日</h3>
+            <p>星期六，中午 12:00 入席，12:30 開席。</p>
+          </article>
+          <article class="info-item reveal">
+            <span>Venue</span>
+            <h3>香檳花園婚宴會館</h3>
+            <p>台北市信義區松仁路 88 號 6 樓。</p>
+          </article>
+          <article class="info-item reveal">
+            <span>Dress</span>
+            <h3>暖色系正式服裝</h3>
+            <p>歡迎以奶白、米色、香檳金或柔和大地色出席。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="schedule">
+      <div class="container">
+        <div class="section-title reveal">
+          <span class="eyebrow">Timeline</span>
+          <h2>婚禮流程</h2>
+        </div>
+        <div class="timeline">
+          <article class="timeline-item reveal">
+            <div class="timeline-time">11:30</div>
+            <div><h3>賓客報到</h3><p>接待桌開放，領取桌卡並拍攝迎賓合影。</p></div>
+          </article>
+          <article class="timeline-item reveal">
+            <div class="timeline-time">12:20</div>
+            <div><h3>新人進場</h3><p>以簡單而溫柔的儀式，分享我們最重要的承諾。</p></div>
+          </article>
+          <article class="timeline-item reveal">
+            <div class="timeline-time">12:40</div>
+            <div><h3>午宴開始</h3><p>享用餐點、敬酒與家人朋友的祝福時刻。</p></div>
+          </article>
+          <article class="timeline-item reveal">
+            <div class="timeline-time">15:00</div>
+            <div><h3>送客合影</h3><p>在午後光線裡留下最後一張溫暖的照片。</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="music-button" id="musicButton" aria-label="播放背景音樂">♪</button>
+  <audio id="bgMusic" loop preload="none">
+    <source src="https://cdn.pixabay.com/audio/2023/10/16/audio_6dd7ff6d71.mp3" type="audio/mpeg">
+  </audio>
+
+  <footer class="footer">With love, Haruto & Aoi</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+    function updateCountdown() {
+      const distance = Math.max(WEDDING_DATE.getTime() - Date.now(), 0);
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((distance / (1000 * 60)) % 60);
+      const seconds = Math.floor((distance / 1000) % 60);
+      document.querySelector('#days').textContent = days;
+      document.querySelector('#hours').textContent = hours;
+      document.querySelector('#minutes').textContent = minutes;
+      document.querySelector('#seconds').textContent = seconds;
+    }
+
+    const music = document.querySelector('#bgMusic');
+    const musicButton = document.querySelector('#musicButton');
+    musicButton.addEventListener('click', async () => {
+      if (music.paused) {
+        await music.play();
+        musicButton.textContent = 'Ⅱ';
+      } else {
+        music.pause();
+        musicButton.textContent = '♪';
+      }
+    });
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>

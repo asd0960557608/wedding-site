@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>婚禮指引 | Haruto & Aoi Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">Haruto & Aoi<small>Wedding Day</small></a>
+      <button class="nav-toggle" data-nav-toggle aria-label="開啟選單"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">首頁</a>
+        <a href="rsvp.html">RSVP</a>
+        <a href="seating.html">桌次查詢</a>
+        <a class="active" href="guide.html">婚禮指引</a>
+        <a href="admin.html">後台</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="page-title reveal">
+        <span class="eyebrow">Guide</span>
+        <h1>婚禮指引</h1>
+        <p>場地、停車、交通與住宿資訊，都整理在這裡。</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="map-frame reveal">
+          <iframe title="婚禮地點 Google Map" loading="lazy" allowfullscreen src="https://www.google.com/maps?q=Taipei%20101&output=embed"></iframe>
+        </div>
+
+        <div class="guide-grid">
+          <article class="guide-block reveal">
+            <h3>停車資訊</h3>
+            <ul>
+              <li>會館地下停車場可折抵 3 小時。</li>
+              <li>假日車位較滿，建議提早 20 分鐘抵達。</li>
+              <li>鄰近信義區市府轉運站停車場可作為備案。</li>
+            </ul>
+          </article>
+          <article class="guide-block reveal">
+            <h3>高鐵 / 火車</h3>
+            <ul>
+              <li>抵達台北車站後，轉乘捷運淡水信義線至台北 101 / 世貿站。</li>
+              <li>由 4 號出口步行約 8 分鐘可抵達會館。</li>
+            </ul>
+          </article>
+          <article class="guide-block reveal">
+            <h3>開車路線</h3>
+            <ul>
+              <li>國道一號接市民高架，往信義區方向。</li>
+              <li>建議導航設定「台北 101」，抵達後依現場指示前往會館。</li>
+            </ul>
+          </article>
+          <article class="guide-block reveal">
+            <h3>捷運 / 公車</h3>
+            <ul>
+              <li>捷運台北 101 / 世貿站步行約 8 分鐘。</li>
+              <li>公車可搭至「市政府站」或「世貿中心站」。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <div class="section-title reveal">
+          <span class="eyebrow">Hotel</span>
+          <h2>飯店資訊</h2>
+        </div>
+        <div class="hotel-list">
+          <article class="hotel-item reveal">
+            <h3>誠品行旅</h3>
+            <p>距離會場約 8 分鐘車程，適合希望住在松菸與信義區附近的賓客。</p>
+          </article>
+          <article class="hotel-item reveal">
+            <h3>台北 W 飯店</h3>
+            <p>鄰近市政府站，交通便利，步行即可抵達信義商圈。</p>
+          </article>
+          <article class="hotel-item reveal">
+            <h3>寒舍艾麗酒店</h3>
+            <p>距離會場近，適合婚禮後想輕鬆休息的外縣市親友。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Travel gently, arrive warmly</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+</body>
+</html>

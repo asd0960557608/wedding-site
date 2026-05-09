@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSVP | Haruto & Aoi Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">Haruto & Aoi<small>Wedding Day</small></a>
+      <button class="nav-toggle" data-nav-toggle aria-label="開啟選單"><span></span><span></span><span></span></button>
+      <div class="nav-links" data-nav-links>
+        <a href="index.html">首頁</a>
+        <a class="active" href="rsvp.html">RSVP</a>
+        <a href="seating.html">桌次查詢</a>
+        <a href="guide.html">婚禮指引</a>
+        <a href="admin.html">後台</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="page-title reveal">
+        <span class="eyebrow">RSVP</span>
+        <h1>出席回覆</h1>
+        <p>請在婚禮前協助填寫，讓我們能妥善安排座位與餐點。</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <form class="form-panel reveal" id="rsvpForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="name">姓名</label>
+              <input id="name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="phone">手機</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="attend_status">是否出席</label>
+              <select id="attend_status" name="attend_status" required>
+                <option value="">請選擇</option>
+                <option value="attending">確認出席</option>
+                <option value="declined">不克出席</option>
+                <option value="pending">尚未確定</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="guest_count">出席人數</label>
+              <input id="guest_count" name="guest_count" type="number" min="1" max="10" value="1" required>
+            </div>
+            <div class="field">
+              <label for="meal_type">餐點偏好</label>
+              <select id="meal_type" name="meal_type">
+                <option value="葷食">葷食</option>
+                <option value="素食">素食</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="note">備註</label>
+              <textarea id="note" name="note" placeholder="例如兒童椅、特殊飲食需求等"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">送出回覆</button>
+            <span class="spinner" id="formSpinner"></span>
+          </div>
+          <div class="notice" id="formNotice"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Thank you for celebrating with us</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/rsvp.js"></script>
+</body>
+</html>
