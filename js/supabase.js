@@ -1,4 +1,4 @@
-const supabaseUrl = 'https://hthhhdxqlyrouoerxjbq.supabase.co/rest/v1/';
+const supabaseUrl = 'https://hthhhdxqlyrouoerxjbq.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aGhoZHhxbHlyb3VvZXJ4amJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyOTMyOTAsImV4cCI6MjA5Mzg2OTI5MH0.zvzFUgri_amW4njCbUZHJnXt-jH55IgDYhgkVFm8gLU';
 
 const hasSupabaseConfig = supabaseUrl.startsWith('https://') && !supabaseKey.includes('YOUR_SUPABASE');
