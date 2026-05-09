@@ -19,6 +19,8 @@
         <a href="rsvp.html">報名登記</a>
         <a href="seating.html">桌次查詢</a>
         <a href="guide.html">婚禮指引</a>
+        <a href="gallery.html">婚紗相簿</a>
+        <a href="qa.html">Q&A</a>
         <a class="active" href="admin.html">後台</a>
       </div>
     </nav>
@@ -29,41 +31,85 @@
       <div class="page-title reveal">
         <span class="eyebrow">Admin</span>
         <h1>賓客管理</h1>
-        <p>查看報名登記資料，搜尋賓客，並更新桌號與出席狀態。</p>
+        <p>查看報名登記、統計人數、匯出名單，並用桌卡方式管理桌次。</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <div class="admin-panel reveal">
+        <div class="form-panel reveal" id="adminLogin">
+          <div class="section-title">
+            <span class="eyebrow">Protected</span>
+            <h2>後台登入</h2>
+            <p>請輸入管理密碼。預設密碼可在 <code>js/admin.js</code> 內修改。</p>
+          </div>
+          <div class="search-row">
+            <input id="adminPassword" type="password" placeholder="管理密碼">
+            <button class="btn" id="adminLoginButton" type="button">登入</button>
+          </div>
+          <div class="notice" id="loginNotice"></div>
+        </div>
+
+        <div class="admin-panel reveal hidden" id="adminApp">
+          <div class="admin-topbar">
+            <div>
+              <span class="eyebrow">Dashboard</span>
+              <h2>報名總覽</h2>
+            </div>
+            <button class="btn ghost" id="adminLogout" type="button">登出</button>
+          </div>
+
+          <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><span>總筆數</span><strong data-stat="total">0</strong></div>
+            <div class="stat-card"><span>確認參加</span><strong data-stat="attending">0</strong></div>
+            <div class="stat-card"><span>總人數</span><strong data-stat="guestCount">0</strong></div>
+            <div class="stat-card"><span>素食</span><strong data-stat="vegetarian">0</strong></div>
+            <div class="stat-card"><span>未排桌</span><strong data-stat="unassigned">0</strong></div>
+          </div>
+
           <div class="admin-toolbar">
             <input id="adminSearch" type="search" placeholder="搜尋姓名、手機、桌號或備註">
             <button class="btn secondary" id="refreshGuests" type="button">重新整理</button>
+            <button class="btn secondary" id="exportCsv" type="button">匯出 CSV</button>
+            <button class="btn secondary" id="exportExcel" type="button">匯出 Excel</button>
           </div>
+
+          <div class="tabbar" role="tablist" aria-label="後台檢視">
+            <button class="tab-button active" data-admin-view="list" type="button">名單列表</button>
+            <button class="tab-button" data-admin-view="table" type="button">桌次視覺化</button>
+          </div>
+
           <div class="form-actions">
             <span class="spinner" id="adminSpinner"></span>
           </div>
           <div class="notice" id="adminNotice"></div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>姓名</th>
-                  <th>手機</th>
-                  <th>出席狀態</th>
-                  <th>人數</th>
-                  <th>餐點</th>
-                  <th>桌號</th>
-                  <th>備註</th>
-                  <th>建立時間</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="guestTableBody">
-                <tr><td colspan="9">資料讀取中。</td></tr>
-              </tbody>
-            </table>
-          </div>
+
+          <section class="admin-view active" id="listView">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>姓名</th>
+                    <th>手機</th>
+                    <th>出席狀態</th>
+                    <th>人數</th>
+                    <th>餐點</th>
+                    <th>桌號</th>
+                    <th>備註</th>
+                    <th>建立時間</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="guestTableBody">
+                  <tr><td colspan="9">資料讀取中。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="admin-view" id="tableView">
+            <div class="seating-board" id="seatingBoard"></div>
+          </section>
         </div>
       </div>
     </section>

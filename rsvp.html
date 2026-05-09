@@ -19,6 +19,8 @@
         <a class="active" href="rsvp.html">報名登記</a>
         <a href="seating.html">桌次查詢</a>
         <a href="guide.html">婚禮指引</a>
+        <a href="gallery.html">婚紗相簿</a>
+        <a href="qa.html">Q&A</a>
         <a href="admin.html">後台</a>
       </div>
     </nav>
@@ -29,13 +31,16 @@
       <div class="page-title reveal">
         <span class="eyebrow">Registration</span>
         <h1>報名登記</h1>
-        <p>請在婚禮前協助填寫，讓我們能妥善安排座位與餐點。</p>
+        <p>請在截止日前填寫或修改資料，讓我們妥善安排座位與餐點。</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
         <form class="form-panel reveal" id="rsvpForm">
+          <p class="deadline-note" id="deadlineText"></p>
+          <input id="guestId" name="guest_id" type="hidden">
+          <input id="registrationMode" name="registration_mode" type="hidden" value="create">
           <div class="form-grid">
             <div class="field">
               <label for="name">姓名</label>
@@ -46,16 +51,16 @@
               <input id="phone" name="phone" type="tel" autocomplete="tel" required>
             </div>
             <div class="field">
-            <label for="attend_status">是否參加</label>
+              <label for="attend_status">是否參加</label>
               <select id="attend_status" name="attend_status" required>
                 <option value="">請選擇</option>
-                <option value="attending">確認出席</option>
-                <option value="declined">不克出席</option>
+                <option value="attending">確認參加</option>
+                <option value="declined">不克參加</option>
                 <option value="pending">尚未確定</option>
               </select>
             </div>
             <div class="field">
-              <label for="guest_count">出席人數</label>
+              <label for="guest_count">參加人數</label>
               <input id="guest_count" name="guest_count" type="number" min="1" max="10" value="1" required>
             </div>
             <div class="field">
@@ -67,11 +72,12 @@
             </div>
             <div class="field full">
               <label for="note">備註</label>
-              <textarea id="note" name="note" placeholder="例如兒童椅、特殊飲食需求等"></textarea>
+              <textarea id="note" name="note" placeholder="例如兒童椅、特殊飲食需求、同行家人姓名等"></textarea>
             </div>
           </div>
           <div class="form-actions">
-            <button class="btn" type="submit">送出登記</button>
+            <button class="btn secondary" id="lookupRegistration" type="button">查詢既有登記</button>
+            <button class="btn" id="submitRegistration" type="submit">送出登記</button>
             <span class="spinner" id="formSpinner"></span>
           </div>
           <div class="notice" id="formNotice"></div>

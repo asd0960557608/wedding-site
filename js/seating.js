@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (!weddingSupabase) {
+      setLoading(spinner, false);
+      showNotice(notice, '尚未設定 Supabase URL 與 API Key，請先完成 js/supabase.js 設定。', 'error');
+      return;
+    }
+
     try {
       const { data, error } = await weddingSupabase
         .from('guests')
@@ -49,13 +55,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-function translateStatus(status) {
-  const labels = {
-    attending: '確認出席',
-    declined: '不克出席',
-    pending: '尚未確認'
-  };
-
-  return labels[status] || status || '尚未確認';
-}

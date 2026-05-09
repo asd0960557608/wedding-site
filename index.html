@@ -19,6 +19,8 @@
         <a href="rsvp.html">報名登記</a>
         <a href="seating.html">桌次查詢</a>
         <a href="guide.html">婚禮指引</a>
+        <a href="gallery.html">婚紗相簿</a>
+        <a href="qa.html">Q&A</a>
         <a href="admin.html">後台</a>
       </div>
     </nav>
@@ -33,6 +35,7 @@
         <div class="hero-date">2027.03.28 Sunday</div>
         <div class="hero-actions">
           <a class="btn" href="rsvp.html">前往報名登記</a>
+          <button class="btn secondary" type="button" data-calendar>加入行事曆</button>
           <a class="btn secondary" href="#details">查看婚禮資訊</a>
         </div>
       </div>
@@ -72,9 +75,9 @@
             <p>新竹市東區公道五路二段105號。</p>
           </article>
           <article class="info-item reveal">
-            <span>Dress</span>
-            <h3>暖色系正式服裝</h3>
-            <p>歡迎以奶白、米色、香檳金或柔和大地色出席。</p>
+            <span>Registration</span>
+            <h3>2027 年 2 月 28 日截止</h3>
+            <p>可於截止日前查詢並修改報名登記資料。</p>
           </article>
         </div>
       </div>
@@ -120,14 +123,10 @@
   <script>
     function updateCountdown() {
       const distance = Math.max(WEDDING_DATE.getTime() - Date.now(), 0);
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((distance / (1000 * 60)) % 60);
-      const seconds = Math.floor((distance / 1000) % 60);
-      document.querySelector('#days').textContent = days;
-      document.querySelector('#hours').textContent = hours;
-      document.querySelector('#minutes').textContent = minutes;
-      document.querySelector('#seconds').textContent = seconds;
+      document.querySelector('#days').textContent = Math.floor(distance / (1000 * 60 * 60 * 24));
+      document.querySelector('#hours').textContent = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      document.querySelector('#minutes').textContent = Math.floor((distance / (1000 * 60)) % 60);
+      document.querySelector('#seconds').textContent = Math.floor((distance / 1000) % 60);
     }
 
     const music = document.querySelector('#bgMusic');
