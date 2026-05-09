@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setBudgetStat('unpaid', Math.max(total - paid, 0));
 
     if (!budgets.length) {
-      renderTableMessage(budgetTableBody, 8, '還沒有預算紀錄。先把最大的幾筆放進來，心裡會踏實很多。');
+      renderTableMessage(budgetTableBody, 10, '還沒有預算紀錄。先把最大的幾筆放進來，心裡會踏實很多。');
       return;
     }
 
@@ -475,6 +475,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <td><input data-budget-field="amount" type="number" min="0" value="${Number(item.amount || 0)}"></td>
         <td><input data-budget-field="paid_amount" type="number" min="0" value="${getPaidAmount(item)}"></td>
         <td>${Math.max(Number(item.amount || 0) - getPaidAmount(item), 0).toLocaleString('zh-TW')}</td>
+        <td><input data-budget-field="payer" value="${escapeAttribute(item.payer || '')}"></td>
+        <td><select data-budget-field="final_payment_method">${paymentMethodOptions(item.final_payment_method)}</select></td>
         <td><select data-budget-field="payment_status">${budgetStatusOptions(item.payment_status)}</select></td>
         <td><input data-budget-field="due_date" type="date" value="${escapeAttribute(item.due_date || '')}"></td>
         <td><div class="row-actions"><button class="btn ghost" data-save-budget>儲存</button><button class="btn danger" data-delete-budget>刪除</button></div></td>
@@ -750,6 +752,8 @@ document.addEventListener('DOMContentLoaded', () => {
       vendor_name: String(data.get('vendor_name') || '').trim(),
       amount: Number(data.get('amount') || 0),
       paid_amount: Number(data.get('paid_amount') || 0),
+      payer: String(data.get('payer') || '').trim(),
+      final_payment_method: data.get('final_payment_method') || null,
       payment_status: data.get('payment_status'),
       due_date: data.get('due_date') || null
     };
@@ -767,6 +771,8 @@ document.addEventListener('DOMContentLoaded', () => {
       vendor_name: row.querySelector('[data-budget-field="vendor_name"]').value.trim(),
       amount: Number(row.querySelector('[data-budget-field="amount"]').value || 0),
       paid_amount: Number(row.querySelector('[data-budget-field="paid_amount"]').value || 0),
+      payer: row.querySelector('[data-budget-field="payer"]').value.trim(),
+      final_payment_method: row.querySelector('[data-budget-field="final_payment_method"]').value || null,
       payment_status: row.querySelector('[data-budget-field="payment_status"]').value,
       due_date: row.querySelector('[data-budget-field="due_date"]').value || null
     });
@@ -1188,6 +1194,16 @@ function budgetStatusOptions(current) {
     ['unpaid', '未付款'],
     ['deposit', '已付訂金'],
     ['paid', '已付清']
+  ];
+  return options.map(([value, label]) => `<option value="${value}" ${current === value ? 'selected' : ''}>${label}</option>`).join('');
+}
+
+function paymentMethodOptions(current) {
+  const options = [
+    ['', '未定'],
+    ['card', '刷卡'],
+    ['transfer', '轉帳'],
+    ['cash', '現金']
   ];
   return options.map(([value, label]) => `<option value="${value}" ${current === value ? 'selected' : ''}>${label}</option>`).join('');
 }

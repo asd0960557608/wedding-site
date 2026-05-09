@@ -230,6 +230,13 @@
               <input name="vendor_name" placeholder="廠商">
               <input name="amount" type="number" min="0" placeholder="總金額">
               <input name="paid_amount" type="number" min="0" placeholder="已付金額">
+              <input name="payer" placeholder="付款方，例如 新郎、新娘、共同">
+              <select name="final_payment_method">
+                <option value="">尾款方式</option>
+                <option value="card">刷卡</option>
+                <option value="transfer">轉帳</option>
+                <option value="cash">現金</option>
+              </select>
               <select name="payment_status"><option value="unpaid">未付款</option><option value="deposit">已付訂金</option><option value="paid">已付清</option></select>
               <input name="due_date" type="date">
               <button class="btn" type="submit">新增預算</button>
@@ -240,7 +247,7 @@
               <div class="stat-card"><span>未付金額</span><strong data-budget-stat="unpaid">0</strong></div>
             </div>
             <div class="table-wrap">
-              <table><thead><tr><th>項目</th><th>廠商</th><th>總金額</th><th>已付金額</th><th>未付金額</th><th>狀態</th><th>到期日</th><th>操作</th></tr></thead><tbody id="budgetTableBody"></tbody></table>
+              <table><thead><tr><th>項目</th><th>廠商</th><th>總金額</th><th>已付金額</th><th>未付金額</th><th>付款方</th><th>尾款方式</th><th>狀態</th><th>到期日</th><th>操作</th></tr></thead><tbody id="budgetTableBody"></tbody></table>
             </div>
           </section>
 

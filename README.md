@@ -103,6 +103,8 @@ create table if not exists wedding_budgets (
   vendor_name text,
   amount numeric default 0,
   paid_amount numeric default 0,
+  payer text,
+  final_payment_method text,
   payment_status text default 'unpaid',
   due_date date,
   created_at timestamp with time zone default now()
@@ -166,7 +168,9 @@ create policy "Allow public vendors all" on wedding_vendors for all to anon usin
 
 ```sql
 alter table wedding_budgets
-add column if not exists paid_amount numeric default 0;
+add column if not exists paid_amount numeric default 0,
+add column if not exists payer text,
+add column if not exists final_payment_method text;
 ```
 
 正式上線時，建議後台另外加上登入驗證，避免任何人都能修改桌號與出席狀態。
@@ -291,7 +295,7 @@ const ADMIN_PASSWORD = 'yu1342027';
 - 住宿需求管理：後台集中查看與更新需要住宿或尚未確定的賓客
 - 婚禮流程管理：後台可新增、修改、刪除流程，首頁會優先顯示後台流程，並可匯出 CSV
 - 桌次版本備份：後台可儲存目前桌次，也可還原指定版本
-- 預算 / 付款紀錄：記錄預算項目、廠商、總金額、已付金額、未付金額、付款狀態與付款期限
+- 預算 / 付款紀錄：記錄預算項目、廠商、總金額、已付金額、未付金額、付款方、尾款付款方式、付款狀態與付款期限
 - 廠商清單：集中管理廠商類別、窗口、電話與備註
 - 婚禮 Q&A：`qa.html`
 
