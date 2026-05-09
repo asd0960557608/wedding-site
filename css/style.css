@@ -209,19 +209,37 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   min-height: 46px;
-  padding: 5px 0;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  padding: 0 18px;
+  border: 1px solid rgba(138, 106, 49, 0.32);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--gold-dark);
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .line-add-button:hover {
-  filter: drop-shadow(0 10px 18px rgba(6, 199, 85, 0.18));
+  background: rgba(255, 250, 240, 0.86);
+  box-shadow: 0 12px 24px rgba(138, 106, 49, 0.18);
   transform: translateY(-1px);
 }
 
-.line-add-button img {
-  height: 36px;
-  width: auto;
+.line-add-button span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 24px;
+  border: 1px solid rgba(140, 154, 131, 0.46);
+  border-radius: 999px;
+  background: rgba(140, 154, 131, 0.12);
+  color: var(--sage);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .section {
