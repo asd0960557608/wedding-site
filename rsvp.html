@@ -31,7 +31,7 @@
       <div class="page-title reveal">
         <span class="eyebrow">Registration</span>
         <h1>報名登記</h1>
-        <p>請在截止日前填寫或修改資料，讓我們妥善安排座位與餐點。</p>
+        <p>把你的名字交給我們，也把那天的一小段時間留給我們。餐點、同行人數、住宿需求都可以先寫在這裡。</p>
       </div>
     </section>
 
@@ -85,6 +85,18 @@
             <div class="field">
               <label for="child_count">兒童椅數量</label>
               <input id="child_count" name="child_count" type="number" min="0" max="10" value="0">
+            </div>
+            <div class="field">
+              <label for="hotel_needed">是否有住宿需求</label>
+              <select id="hotel_needed" name="hotel_needed">
+                <option value="no">暫不需要</option>
+                <option value="yes">需要，想收到方案資訊</option>
+                <option value="maybe">還不確定，先幫我留意</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="hotel_guest_count">住宿人數</label>
+              <input id="hotel_guest_count" name="hotel_guest_count" type="number" min="0" max="10" value="0">
             </div>
             <div class="field full">
               <label for="special_need">特殊需求</label>

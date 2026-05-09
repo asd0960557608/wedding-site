@@ -31,7 +31,7 @@
       <div class="page-title reveal">
         <span class="eyebrow">Admin</span>
         <h1>賓客管理</h1>
-        <p>查看報名登記、統計人數、匯出名單，並用桌卡方式管理桌次。</p>
+        <p>這裡是婚禮前的小小控制室：確認誰會來、誰要住、哪一桌還有空位，讓當天少一點手忙腳亂，多一點好好相見。</p>
       </div>
     </section>
 
@@ -41,7 +41,7 @@
           <div class="section-title">
             <span class="eyebrow">Protected</span>
             <h2>後台登入</h2>
-            <p>請輸入管理密碼。預設密碼可在 <code>js/admin.js</code> 內修改。</p>
+            <p>請輸入管理密碼，進來整理這一天的座位與名單。</p>
           </div>
           <div class="search-row">
             <input id="adminPassword" type="password" placeholder="管理密碼">
@@ -68,6 +68,7 @@
             <div class="stat-card"><span>總桌數</span><strong data-stat="tableCount">0</strong></div>
             <div class="stat-card"><span>已排桌人數</span><strong data-stat="seatedCount">0</strong></div>
             <div class="stat-card"><span>兒童椅</span><strong data-stat="childSeats">0</strong></div>
+            <div class="stat-card"><span>住宿需求人數</span><strong data-stat="hotelNeeds">0</strong></div>
             <div class="stat-card"><span>特殊需求</span><strong data-stat="specialNeeds">0</strong></div>
             <div class="stat-card"><span>可能重複</span><strong data-stat="duplicates">0</strong></div>
           </div>
@@ -127,6 +128,8 @@
                     <th>餐點</th>
                     <th>分組</th>
                     <th>兒童椅</th>
+                    <th>住宿</th>
+                    <th>住宿人數</th>
                     <th>特殊需求</th>
                     <th>桌號</th>
                     <th>備註</th>
@@ -135,7 +138,7 @@
                   </tr>
                 </thead>
               <tbody id="guestTableBody">
-                  <tr><td colspan="12">資料讀取中。</td></tr>
+                  <tr><td colspan="14">資料讀取中。</td></tr>
               </tbody>
               </table>
             </div>

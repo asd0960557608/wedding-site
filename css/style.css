@@ -279,6 +279,12 @@ h3 {
   color: var(--gold-dark);
 }
 
+.btn.danger {
+  border-color: rgba(176, 78, 65, 0.28);
+  background: rgba(176, 78, 65, 0.08);
+  color: #9d4639;
+}
+
 .btn:disabled {
   cursor: not-allowed;
   opacity: 0.58;
@@ -569,6 +575,74 @@ textarea:focus {
   margin-top: 24px;
 }
 
+.venue-highlight {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 22px;
+  align-items: stretch;
+  margin-bottom: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--shadow);
+  padding: clamp(22px, 4vw, 38px);
+}
+
+.venue-highlight h2 {
+  margin: 8px 0 10px;
+  color: var(--gold-dark);
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  font-weight: 500;
+}
+
+.venue-highlight p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.venue-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.venue-facts article {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(247, 239, 226, 0.55);
+  padding: 18px;
+}
+
+.venue-facts strong {
+  color: var(--gold-dark);
+}
+
+.venue-facts span {
+  color: var(--muted);
+}
+
+.guide-grid-featured {
+  margin-top: 28px;
+}
+
+.guide-tag {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--gold-dark);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  padding: 3px 9px;
+  text-transform: uppercase;
+}
+
 .guide-block h3,
 .hotel-item h3 {
   color: var(--gold-dark);
@@ -654,6 +728,11 @@ textarea:focus {
   width: 16px;
   height: 16px;
   accent-color: var(--gold-dark);
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .admin-topbar {
@@ -979,7 +1058,7 @@ textarea:focus {
 
 table {
   width: 100%;
-  min-width: 1240px;
+  min-width: 1680px;
   border-collapse: collapse;
   background: rgba(255, 255, 255, 0.56);
 }
@@ -1068,6 +1147,8 @@ td select {
   .countdown,
   .info-grid,
   .guide-grid,
+  .venue-highlight,
+  .venue-facts,
   .form-grid,
   .stats-grid,
   .seating-board,

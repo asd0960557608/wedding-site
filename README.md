@@ -47,6 +47,8 @@ create table guests (
   meal_type text,
   group_name text,
   child_count int default 0,
+  hotel_needed text default 'no',
+  hotel_guest_count int default 0,
   special_need text,
   note text,
   table_no text,
@@ -60,6 +62,8 @@ create table guests (
 alter table guests
 add column if not exists group_name text,
 add column if not exists child_count int default 0,
+add column if not exists hotel_needed text default 'no',
+add column if not exists hotel_guest_count int default 0,
 add column if not exists special_need text;
 ```
 
@@ -83,6 +87,11 @@ on guests for update
 to anon
 using (true)
 with check (true);
+
+create policy "Allow public delete"
+on guests for delete
+to anon
+using (true);
 ```
 
 正式上線時，建議後台另外加上登入驗證，避免任何人都能修改桌號與出席狀態。
@@ -195,11 +204,13 @@ const ADMIN_PASSWORD = 'yu1342027';
 - 桌次查詢：用姓名或手機查詢桌號與備註
 - 婚禮指引：Google Map、停車、交通、飯店資訊
 - 後台：登入保護、統計儀表板、搜尋、修改桌號、修改出席狀態
+- 後台資料管理：可直接修改報名資料，也可刪除錯誤或重複報名
 - 匯出資料：後台可匯出 CSV 與 Excel
 - 桌次視覺化：後台用桌卡方式查看每桌賓客與人數
 - 排桌工具：每桌人數上限、未排桌名單、拖曳排桌、批次指定桌號、桌號篩選
 - 現場輸出：列印桌次表、賓客公告版
 - 管理提醒：同桌備註、關係分組、兒童椅與特殊需求統計、重複姓名/手機提醒
+- 住宿需求：報名表可勾選是否需要住宿，並填寫住宿人數；方案內容可日後公布
 - 婚紗相簿：`gallery.html`
 - 婚禮 Q&A：`qa.html`
 

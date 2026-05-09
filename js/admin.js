@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guest.table_no,
         guest.meal_type,
         guest.group_name,
+        guest.hotel_needed,
         guest.special_need,
         guest.note
       ].filter(Boolean).some((value) => String(value).toLowerCase().includes(keyword));
@@ -152,6 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .filter((guest) => guest.meal_type === '素食')
       .reduce((sum, guest) => sum + getGuestCount(guest), 0);
     const childSeats = attending.reduce((sum, guest) => sum + Number(guest.child_count || 0), 0);
+    const hotelNeeds = attending
+      .filter((guest) => guest.hotel_needed === 'yes' || guest.hotel_needed === 'maybe')
+      .reduce((sum, guest) => sum + Number(guest.hotel_guest_count || 0), 0);
     const specialNeeds = attending.filter((guest) => String(guest.special_need || '').trim()).length;
     const unassigned = attending.filter((guest) => !guest.table_no).reduce((sum, guest) => sum + getGuestCount(guest), 0);
     const duplicates = findDuplicates().length;
@@ -166,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setStat('childSeats', childSeats);
     setStat('specialNeeds', specialNeeds);
     setStat('duplicates', duplicates);
+    setStat('hotelNeeds', hotelNeeds);
   }
 
   function setStat(name, value) {
@@ -188,14 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const filtered = getFilteredGuests();
 
     if (!filtered.length) {
-      tableBody.innerHTML = '<tr><td colspan="12">目前沒有符合條件的資料。</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="14">目前沒有符合條件的資料。</td></tr>';
       return;
     }
 
     tableBody.innerHTML = filtered.map((guest) => `
       <tr data-id="${guest.id}">
-        <td><label class="check-label"><input type="checkbox" data-select-guest value="${guest.id}"><span>${escapeHtml(guest.name)}</span></label></td>
-        <td>${escapeHtml(guest.phone || '')}</td>
+        <td><label class="check-label"><input type="checkbox" data-select-guest value="${guest.id}"><input data-field="name" value="${escapeAttribute(guest.name || '')}" aria-label="姓名"></label></td>
+        <td><input data-field="phone" value="${escapeAttribute(guest.phone || '')}" aria-label="手機"></td>
         <td>
           <select data-field="attend_status">
             <option value="pending" ${guest.attend_status === 'pending' ? 'selected' : ''}>尚未確認</option>
@@ -203,15 +208,32 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="declined" ${guest.attend_status === 'declined' ? 'selected' : ''}>不克參加</option>
           </select>
         </td>
-        <td>${getGuestCount(guest)}</td>
-        <td>${escapeHtml(guest.meal_type || '')}</td>
-        <td>${escapeHtml(guest.group_name || '')}</td>
-        <td>${Number(guest.child_count || 0)}</td>
-        <td>${escapeHtml(guest.special_need || '')}</td>
+        <td><input data-field="guest_count" type="number" min="1" max="10" value="${getGuestCount(guest)}" aria-label="人數"></td>
+        <td>
+          <select data-field="meal_type">
+            <option value="葷食" ${guest.meal_type === '葷食' ? 'selected' : ''}>葷食</option>
+            <option value="素食" ${guest.meal_type === '素食' ? 'selected' : ''}>素食</option>
+          </select>
+        </td>
+        <td>
+          <select data-field="group_name">
+            ${['', '男方親友', '女方親友', '同事', '同學', '朋友', '其他'].map((item) => `<option value="${escapeAttribute(item)}" ${guest.group_name === item ? 'selected' : ''}>${item || '未分組'}</option>`).join('')}
+          </select>
+        </td>
+        <td><input data-field="child_count" type="number" min="0" max="10" value="${Number(guest.child_count || 0)}" aria-label="兒童椅"></td>
+        <td>
+          <select data-field="hotel_needed">
+            <option value="no" ${guest.hotel_needed === 'no' || !guest.hotel_needed ? 'selected' : ''}>不需要</option>
+            <option value="yes" ${guest.hotel_needed === 'yes' ? 'selected' : ''}>需要</option>
+            <option value="maybe" ${guest.hotel_needed === 'maybe' ? 'selected' : ''}>未確定</option>
+          </select>
+        </td>
+        <td><input data-field="hotel_guest_count" type="number" min="0" max="10" value="${Number(guest.hotel_guest_count || 0)}" aria-label="住宿人數"></td>
+        <td><input data-field="special_need" value="${escapeAttribute(guest.special_need || '')}" aria-label="特殊需求"></td>
         <td><input data-field="table_no" value="${escapeAttribute(guest.table_no || '')}" placeholder="例如 A1"></td>
-        <td>${escapeHtml(guest.note || '')}</td>
+        <td><input data-field="note" value="${escapeAttribute(guest.note || '')}" aria-label="備註"></td>
         <td>${formatDate(guest.created_at)}</td>
-        <td><button class="btn ghost" data-save>儲存</button></td>
+        <td><div class="row-actions"><button class="btn ghost" data-save>儲存</button><button class="btn danger" data-delete>刪除</button></div></td>
       </tr>
     `).join('');
   }
@@ -306,15 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function saveGuest(row, saveButton) {
     const id = Number(row.dataset.id);
-    const attendStatus = row.querySelector('[data-field="attend_status"]').value;
-    const tableNo = row.querySelector('[data-field="table_no"]').value.trim();
+    const patch = readGuestPatchFromRow(row);
 
     saveButton.disabled = true;
     saveButton.textContent = '儲存中';
     clearNotice(notice);
 
     try {
-      await updateGuest(id, { attend_status: attendStatus, table_no: tableNo || null });
+      await updateGuest(id, patch);
       showNotice(notice, '資料已更新。', 'success');
     } catch (error) {
       showNotice(notice, `更新時發生問題：${friendlyDbError(error)}`, 'error');
@@ -322,6 +343,23 @@ document.addEventListener('DOMContentLoaded', () => {
       saveButton.disabled = false;
       saveButton.textContent = '儲存';
     }
+  }
+
+  function readGuestPatchFromRow(row) {
+    return {
+      name: row.querySelector('[data-field="name"]').value.trim(),
+      phone: sanitizePhone(row.querySelector('[data-field="phone"]').value),
+      attend_status: row.querySelector('[data-field="attend_status"]').value,
+      guest_count: Number(row.querySelector('[data-field="guest_count"]').value || 1),
+      meal_type: row.querySelector('[data-field="meal_type"]').value,
+      group_name: row.querySelector('[data-field="group_name"]').value || null,
+      child_count: Number(row.querySelector('[data-field="child_count"]').value || 0),
+      hotel_needed: row.querySelector('[data-field="hotel_needed"]').value,
+      hotel_guest_count: Number(row.querySelector('[data-field="hotel_guest_count"]').value || 0),
+      special_need: row.querySelector('[data-field="special_need"]').value.trim(),
+      table_no: row.querySelector('[data-field="table_no"]').value.trim() || null,
+      note: row.querySelector('[data-field="note"]').value.trim()
+    };
   }
 
   async function updateGuestTable(id, tableNo) {
@@ -343,6 +381,35 @@ document.addEventListener('DOMContentLoaded', () => {
     guests = guests.map((guest) => guest.id === id ? { ...guest, ...patch } : guest);
     window.guests = guests;
     renderAll();
+  }
+
+  async function deleteGuest(id) {
+    const guest = guests.find((item) => item.id === id);
+    if (!guest) return;
+
+    const confirmed = window.confirm(`確定要刪除「${guest.name}」的報名資料嗎？這個動作無法復原。`);
+    if (!confirmed) return;
+
+    clearNotice(notice);
+    setLoading(spinner, true);
+
+    try {
+      const { error } = await weddingSupabase
+        .from('guests')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      guests = guests.filter((item) => item.id !== id);
+      window.guests = guests;
+      showNotice(notice, '已刪除這筆報名資料。', 'success');
+      renderAll();
+    } catch (error) {
+      showNotice(notice, `刪除時發生問題：${friendlyDbError(error)}`, 'error');
+    } finally {
+      setLoading(spinner, false);
+    }
   }
 
   async function batchAssign() {
@@ -396,12 +463,14 @@ document.addEventListener('DOMContentLoaded', () => {
       meal_type: guest.meal_type || '',
       group_name: guest.group_name || '',
       child_count: Number(guest.child_count || 0),
+      hotel_needed: translateHotelNeed(guest.hotel_needed),
+      hotel_guest_count: Number(guest.hotel_guest_count || 0),
       special_need: guest.special_need || '',
       table_no: guest.table_no || '',
       note: guest.note || '',
       created_at: formatDate(guest.created_at)
     }));
-    const header = ['姓名', '手機', '出席狀態', '人數', '餐點', '分組', '兒童椅', '特殊需求', '桌號', '備註', '建立時間'];
+    const header = ['姓名', '手機', '出席狀態', '人數', '餐點', '分組', '兒童椅', '住宿需求', '住宿人數', '特殊需求', '桌號', '備註', '建立時間'];
 
     if (type === 'csv') {
       const csv = [header, ...rows.map(Object.values)]
@@ -439,10 +508,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <h2>${escapeHtml(tableNo)} <small>${count} 人</small></h2>
           ${!isPublic && tableNotes[tableNo] ? `<p>${escapeHtml(tableNotes[tableNo])}</p>` : ''}
           <table>
-            <tr>${isPublic ? '<th>姓名</th><th>桌號</th>' : '<th>姓名</th><th>人數</th><th>餐點</th><th>分組</th><th>特殊需求</th><th>備註</th>'}</tr>
+          <tr>${isPublic ? '<th>姓名</th><th>桌號</th>' : '<th>姓名</th><th>人數</th><th>餐點</th><th>分組</th><th>特殊需求</th><th>備註</th>'}</tr>
             ${list.map((guest) => isPublic
               ? `<tr><td>${escapeHtml(guest.name)}</td><td>${escapeHtml(tableNo)}</td></tr>`
-              : `<tr><td>${escapeHtml(guest.name)}</td><td>${getGuestCount(guest)}</td><td>${escapeHtml(guest.meal_type || '')}</td><td>${escapeHtml(guest.group_name || '')}</td><td>${escapeHtml(guest.special_need || '')}</td><td>${escapeHtml(guest.note || '')}</td></tr>`
+              : `<tr><td>${escapeHtml(guest.name)}</td><td>${getGuestCount(guest)}</td><td>${escapeHtml(guest.meal_type || '')}</td><td>${escapeHtml(guest.group_name || '')}</td><td>${escapeHtml(guest.special_need || '')}</td><td>${escapeHtml(formatHotelText(guest))}</td><td>${escapeHtml(guest.note || '')}</td></tr>`
             ).join('')}
           </table>
         </section>
@@ -453,8 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <section class="print-table">
         <h2>未排桌</h2>
         <table>
-          <tr><th>姓名</th><th>人數</th><th>餐點</th><th>分組</th><th>備註</th></tr>
-          ${unassigned.map((guest) => `<tr><td>${escapeHtml(guest.name)}</td><td>${getGuestCount(guest)}</td><td>${escapeHtml(guest.meal_type || '')}</td><td>${escapeHtml(guest.group_name || '')}</td><td>${escapeHtml(guest.note || '')}</td></tr>`).join('')}
+          <tr><th>姓名</th><th>人數</th><th>餐點</th><th>分組</th><th>住宿</th><th>備註</th></tr>
+          ${unassigned.map((guest) => `<tr><td>${escapeHtml(guest.name)}</td><td>${getGuestCount(guest)}</td><td>${escapeHtml(guest.meal_type || '')}</td><td>${escapeHtml(guest.group_name || '')}</td><td>${escapeHtml(formatHotelText(guest))}</td><td>${escapeHtml(guest.note || '')}</td></tr>`).join('')}
         </table>
       </section>
     ` : '';
@@ -499,8 +568,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tableBody.addEventListener('click', (event) => {
     const saveButton = event.target.closest('[data-save]');
-    if (!saveButton) return;
-    saveGuest(saveButton.closest('tr'), saveButton);
+    const deleteButton = event.target.closest('[data-delete]');
+    if (saveButton) {
+      saveGuest(saveButton.closest('tr'), saveButton);
+      return;
+    }
+    if (deleteButton) {
+      deleteGuest(Number(deleteButton.closest('tr').dataset.id));
+    }
   });
 
   seatingBoard.addEventListener('input', (event) => {
@@ -602,9 +677,27 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function translateHotelNeed(value) {
+  const labels = {
+    yes: '需要',
+    maybe: '未確定',
+    no: '不需要'
+  };
+
+  return labels[value] || '不需要';
+}
+
+function formatHotelText(guest) {
+  const label = translateHotelNeed(guest.hotel_needed);
+  const count = Number(guest.hotel_guest_count || 0);
+  return count > 0 ? `${label}，${count} 人` : label;
+}
+
 function friendlyDbError(error) {
   if (String(error.message || '').includes('group_name')
     || String(error.message || '').includes('child_count')
+    || String(error.message || '').includes('hotel_needed')
+    || String(error.message || '').includes('hotel_guest_count')
     || String(error.message || '').includes('special_need')) {
     return `${error.message}。請先依 README 執行欄位 migration。`;
   }
