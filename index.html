@@ -114,7 +114,7 @@
 
   <button class="music-button" id="musicButton" aria-label="播放背景音樂">♪</button>
   <audio id="bgMusic" loop preload="none">
-    <source src="C:\Users\Yu\Documents\New project\wedding-site\music\Gravity_of_Us.mp3" type="audio/mpeg">
+    <source src="music/Gravity_of_Us.mp3" type="audio/mpeg">
   </audio>
 
   <footer class="footer">With love, Yu & 134</footer>
@@ -133,14 +133,31 @@
 
     const music = document.querySelector('#bgMusic');
     const musicButton = document.querySelector('#musicButton');
-    musicButton.addEventListener('click', async () => {
-      if (music.paused) {
+
+    async function playMusic() {
+      try {
         await music.play();
         musicButton.textContent = 'Ⅱ';
+        musicButton.setAttribute('aria-label', '暫停背景音樂');
+      } catch (error) {
+        musicButton.textContent = '♪';
+        musicButton.setAttribute('aria-label', '播放背景音樂');
+        console.info('Autoplay was blocked. User interaction is required.', error);
+      }
+    }
+
+    musicButton.addEventListener('click', async () => {
+      if (music.paused) {
+        await playMusic();
       } else {
         music.pause();
         musicButton.textContent = '♪';
+        musicButton.setAttribute('aria-label', '播放背景音樂');
       }
+    });
+
+    window.addEventListener('load', () => {
+      playMusic();
     });
 
     updateCountdown();
@@ -148,4 +165,3 @@
   </script>
 </body>
 </html>
-
