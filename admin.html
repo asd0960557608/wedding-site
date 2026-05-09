@@ -65,13 +65,44 @@
             <div class="stat-card"><span>總人數</span><strong data-stat="guestCount">0</strong></div>
             <div class="stat-card"><span>素食</span><strong data-stat="vegetarian">0</strong></div>
             <div class="stat-card"><span>未排桌</span><strong data-stat="unassigned">0</strong></div>
+            <div class="stat-card"><span>總桌數</span><strong data-stat="tableCount">0</strong></div>
+            <div class="stat-card"><span>已排桌人數</span><strong data-stat="seatedCount">0</strong></div>
+            <div class="stat-card"><span>兒童椅</span><strong data-stat="childSeats">0</strong></div>
+            <div class="stat-card"><span>特殊需求</span><strong data-stat="specialNeeds">0</strong></div>
+            <div class="stat-card"><span>可能重複</span><strong data-stat="duplicates">0</strong></div>
           </div>
 
           <div class="admin-toolbar">
             <input id="adminSearch" type="search" placeholder="搜尋姓名、手機、桌號或備註">
+            <select id="tableFilter" aria-label="桌號篩選">
+              <option value="">全部桌號</option>
+            </select>
             <button class="btn secondary" id="refreshGuests" type="button">重新整理</button>
             <button class="btn secondary" id="exportCsv" type="button">匯出 CSV</button>
             <button class="btn secondary" id="exportExcel" type="button">匯出 Excel</button>
+          </div>
+
+          <div class="admin-tools">
+            <div class="tool-box">
+              <label for="tableCapacity">每桌人數上限</label>
+              <input id="tableCapacity" type="number" min="1" max="30" value="10">
+            </div>
+            <div class="tool-box wide">
+              <label for="batchTableNo">批次指定桌號</label>
+              <div class="inline-controls">
+                <input id="batchTableNo" type="text" placeholder="例如 A1、主桌">
+                <button class="btn secondary" id="batchAssign" type="button">套用至勾選</button>
+              </div>
+            </div>
+            <div class="tool-box actions">
+              <button class="btn ghost" id="printSeating" type="button">列印桌次表</button>
+              <button class="btn ghost" id="printPublicBoard" type="button">賓客公告版</button>
+            </div>
+          </div>
+
+          <div class="warning-panel hidden" id="duplicatePanel">
+            <h3>可能重複報名</h3>
+            <div id="duplicateList"></div>
           </div>
 
           <div class="tabbar" role="tablist" aria-label="後台檢視">
@@ -94,20 +125,35 @@
                     <th>出席狀態</th>
                     <th>人數</th>
                     <th>餐點</th>
+                    <th>分組</th>
+                    <th>兒童椅</th>
+                    <th>特殊需求</th>
                     <th>桌號</th>
                     <th>備註</th>
                     <th>建立時間</th>
                     <th>操作</th>
                   </tr>
                 </thead>
-                <tbody id="guestTableBody">
-                  <tr><td colspan="9">資料讀取中。</td></tr>
-                </tbody>
+              <tbody id="guestTableBody">
+                  <tr><td colspan="12">資料讀取中。</td></tr>
+              </tbody>
               </table>
             </div>
           </section>
 
           <section class="admin-view" id="tableView">
+            <div class="unassigned-panel">
+              <div class="table-card-head">
+                <div>
+                  <span>Unassigned</span>
+                  <h3>未排桌名單</h3>
+                </div>
+                <strong data-unassigned-count>0 人</strong>
+              </div>
+              <div class="guest-dropzone" data-table-drop="">
+                <div class="mini-guest-list" id="unassignedList"></div>
+              </div>
+            </div>
             <div class="seating-board" id="seatingBoard"></div>
           </section>
         </div>

@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
       form.attend_status.value = guest.attend_status || 'pending';
       form.guest_count.value = guest.guest_count || 1;
       form.meal_type.value = guest.meal_type || '葷食';
+      form.group_name.value = guest.group_name || '';
+      form.child_count.value = guest.child_count || 0;
+      form.special_need.value = guest.special_need || '';
       form.note.value = guest.note || '';
       guestIdInput.value = guest.id;
       modeInput.value = 'update';
@@ -96,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
       attend_status: formData.get('attend_status'),
       guest_count: Number(formData.get('guest_count') || 1),
       meal_type: formData.get('meal_type'),
+      group_name: formData.get('group_name') || null,
+      child_count: Number(formData.get('child_count') || 0),
+      special_need: String(formData.get('special_need') || '').trim(),
       note: String(formData.get('note') || '').trim()
     };
 
@@ -124,9 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ? '已更新您的報名登記，謝謝您。'
         : '已收到您的報名登記，謝謝您把這一天留給我們。', 'success');
     } catch (error) {
-      showNotice(notice, `送出時發生問題：${error.message}`, 'error');
+      showNotice(notice, `送出時發生問題：${friendlyRegistrationError(error)}`, 'error');
     } finally {
       setLoading(spinner, false);
     }
   });
 });
+
+function friendlyRegistrationError(error) {
+  const message = String(error.message || '');
+  if (message.includes('group_name') || message.includes('child_count') || message.includes('special_need')) {
+    return `${message}。請先依 README 執行欄位 migration。`;
+  }
+
+  return message;
+}

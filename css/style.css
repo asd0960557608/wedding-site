@@ -592,9 +592,68 @@ textarea:focus {
 
 .admin-toolbar {
   display: grid;
-  grid-template-columns: 1fr repeat(3, auto);
+  grid-template-columns: 1fr 180px repeat(3, auto);
   gap: 12px;
   margin-bottom: 18px;
+}
+
+.admin-tools {
+  display: grid;
+  grid-template-columns: 170px 1fr auto;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.tool-box {
+  display: grid;
+  gap: 8px;
+  align-content: end;
+}
+
+.tool-box.actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.inline-controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.warning-panel {
+  margin-bottom: 18px;
+  border: 1px solid rgba(176, 78, 65, 0.28);
+  border-radius: var(--radius);
+  background: rgba(176, 78, 65, 0.08);
+  padding: 16px;
+}
+
+.warning-panel h3 {
+  color: #9d4639;
+  font-size: 1rem;
+}
+
+.warning-item {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  color: var(--muted);
+}
+
+.check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.check-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold-dark);
 }
 
 .admin-topbar {
@@ -675,11 +734,28 @@ textarea:focus {
   gap: 16px;
 }
 
+.unassigned-panel {
+  margin-bottom: 18px;
+  border: 1px dashed rgba(138, 106, 49, 0.38);
+  border-radius: var(--radius);
+  background: rgba(255, 250, 240, 0.62);
+  overflow: hidden;
+}
+
 .table-card {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.58);
   overflow: hidden;
+}
+
+.table-card.over-capacity {
+  border-color: rgba(176, 78, 65, 0.48);
+  box-shadow: 0 18px 50px rgba(176, 78, 65, 0.12);
+}
+
+.table-card.over-capacity .table-card-head {
+  background: rgba(176, 78, 65, 0.1);
 }
 
 .table-card-head {
@@ -711,6 +787,32 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.table-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 18px 0;
+}
+
+.table-meta span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  padding: 3px 9px;
+}
+
+.table-note {
+  display: grid;
+  gap: 6px;
+  padding: 12px 18px 0;
+}
+
+.table-note textarea {
+  min-height: 72px;
+  padding: 9px 11px;
+}
+
 .table-card ul {
   display: grid;
   gap: 10px;
@@ -730,6 +832,48 @@ textarea:focus {
 .table-card small {
   color: var(--muted);
   white-space: nowrap;
+}
+
+.guest-dropzone {
+  min-height: 88px;
+  padding: 14px 18px 18px;
+  transition: background 0.2s ease, outline 0.2s ease;
+}
+
+.guest-dropzone.drag-over {
+  background: rgba(201, 168, 106, 0.12);
+  outline: 2px dashed rgba(138, 106, 49, 0.45);
+  outline-offset: -8px;
+}
+
+.mini-guest-list {
+  display: grid;
+  gap: 10px;
+}
+
+.guest-card {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(138, 106, 49, 0.18);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.78);
+  cursor: grab;
+  padding: 10px 12px;
+}
+
+.guest-card:active {
+  cursor: grabbing;
+}
+
+.guest-card small,
+.guest-card em {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
+.guest-card em {
+  color: #9d4639;
 }
 
 .gallery-grid {
@@ -835,7 +979,7 @@ textarea:focus {
 
 table {
   width: 100%;
-  min-width: 900px;
+  min-width: 1240px;
   border-collapse: collapse;
   background: rgba(255, 255, 255, 0.56);
 }
@@ -947,7 +1091,9 @@ td select {
   }
 
   .search-row,
-  .admin-toolbar {
+  .admin-toolbar,
+  .admin-tools,
+  .inline-controls {
     grid-template-columns: 1fr;
   }
 
@@ -958,6 +1104,11 @@ td select {
 
   .tabbar {
     overflow-x: auto;
+  }
+
+  .tool-box.actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .form-actions {
