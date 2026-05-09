@@ -228,18 +228,19 @@
             <form class="mini-form" id="budgetForm">
               <input name="item_name" placeholder="項目，例如 婚攝" required>
               <input name="vendor_name" placeholder="廠商">
-              <input name="amount" type="number" min="0" placeholder="金額">
+              <input name="amount" type="number" min="0" placeholder="總金額">
+              <input name="paid_amount" type="number" min="0" placeholder="已付金額">
               <select name="payment_status"><option value="unpaid">未付款</option><option value="deposit">已付訂金</option><option value="paid">已付清</option></select>
               <input name="due_date" type="date">
               <button class="btn" type="submit">新增預算</button>
             </form>
             <div class="stats-grid compact">
-              <div class="stat-card"><span>總預算</span><strong data-budget-stat="total">0</strong></div>
-              <div class="stat-card"><span>已付清</span><strong data-budget-stat="paid">0</strong></div>
-              <div class="stat-card"><span>待付款</span><strong data-budget-stat="unpaid">0</strong></div>
+              <div class="stat-card"><span>總金額</span><strong data-budget-stat="total">0</strong></div>
+              <div class="stat-card"><span>已付金額</span><strong data-budget-stat="paid">0</strong></div>
+              <div class="stat-card"><span>未付金額</span><strong data-budget-stat="unpaid">0</strong></div>
             </div>
             <div class="table-wrap">
-              <table><thead><tr><th>項目</th><th>廠商</th><th>金額</th><th>狀態</th><th>到期日</th><th>操作</th></tr></thead><tbody id="budgetTableBody"></tbody></table>
+              <table><thead><tr><th>項目</th><th>廠商</th><th>總金額</th><th>已付金額</th><th>未付金額</th><th>狀態</th><th>到期日</th><th>操作</th></tr></thead><tbody id="budgetTableBody"></tbody></table>
             </div>
           </section>
 

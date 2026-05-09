@@ -458,13 +458,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderBudgets() {
     if (!budgetTableBody) return;
     const total = budgets.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-    const paid = budgets.filter((item) => item.payment_status === 'paid').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const paid = budgets.reduce((sum, item) => sum + getPaidAmount(item), 0);
     setBudgetStat('total', total);
     setBudgetStat('paid', paid);
     setBudgetStat('unpaid', Math.max(total - paid, 0));
 
     if (!budgets.length) {
-      renderTableMessage(budgetTableBody, 6, '還沒有預算紀錄。先把最大的幾筆放進來，心裡會踏實很多。');
+      renderTableMessage(budgetTableBody, 8, '還沒有預算紀錄。先把最大的幾筆放進來，心裡會踏實很多。');
       return;
     }
 
@@ -473,6 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <td><input data-budget-field="item_name" value="${escapeAttribute(item.item_name || '')}"></td>
         <td><input data-budget-field="vendor_name" value="${escapeAttribute(item.vendor_name || '')}"></td>
         <td><input data-budget-field="amount" type="number" min="0" value="${Number(item.amount || 0)}"></td>
+        <td><input data-budget-field="paid_amount" type="number" min="0" value="${getPaidAmount(item)}"></td>
+        <td>${Math.max(Number(item.amount || 0) - getPaidAmount(item), 0).toLocaleString('zh-TW')}</td>
         <td><select data-budget-field="payment_status">${budgetStatusOptions(item.payment_status)}</select></td>
         <td><input data-budget-field="due_date" type="date" value="${escapeAttribute(item.due_date || '')}"></td>
         <td><div class="row-actions"><button class="btn ghost" data-save-budget>儲存</button><button class="btn danger" data-delete-budget>刪除</button></div></td>
@@ -747,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
       item_name: String(data.get('item_name') || '').trim(),
       vendor_name: String(data.get('vendor_name') || '').trim(),
       amount: Number(data.get('amount') || 0),
+      paid_amount: Number(data.get('paid_amount') || 0),
       payment_status: data.get('payment_status'),
       due_date: data.get('due_date') || null
     };
@@ -763,6 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
       item_name: row.querySelector('[data-budget-field="item_name"]').value.trim(),
       vendor_name: row.querySelector('[data-budget-field="vendor_name"]').value.trim(),
       amount: Number(row.querySelector('[data-budget-field="amount"]').value || 0),
+      paid_amount: Number(row.querySelector('[data-budget-field="paid_amount"]').value || 0),
       payment_status: row.querySelector('[data-budget-field="payment_status"]').value,
       due_date: row.querySelector('[data-budget-field="due_date"]').value || null
     });
@@ -1091,6 +1095,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function getGuestCount(guest) {
   return Number(guest.guest_count || 1);
+}
+
+function getPaidAmount(item) {
+  if (item.payment_status === 'paid') return Number(item.amount || 0);
+  return Number(item.paid_amount || 0);
 }
 
 function getCapacity() {
