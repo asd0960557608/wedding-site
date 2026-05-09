@@ -746,6 +746,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function createBudget(event) {
     event.preventDefault();
+    clearNotice(notice);
+    setLoading(spinner, true);
+
+    if (!weddingSupabase) {
+      setLoading(spinner, false);
+      showNotice(notice, '尚未設定 Supabase，不能新增預算。', 'error');
+      return;
+    }
+
     const data = new FormData(budgetForm);
     const payload = {
       item_name: String(data.get('item_name') || '').trim(),
@@ -757,11 +766,29 @@ document.addEventListener('DOMContentLoaded', () => {
       payment_status: data.get('payment_status'),
       due_date: data.get('due_date') || null
     };
-    if (!payload.item_name) return;
-    const { error } = await weddingSupabase.from('wedding_budgets').insert([payload]);
-    if (error) throw error;
-    budgetForm.reset();
-    await loadBudgets();
+
+    if (!payload.item_name) {
+      setLoading(spinner, false);
+      showNotice(notice, '請先填寫預算項目名稱。', 'error');
+      return;
+    }
+
+    try {
+      const { data: inserted, error } = await weddingSupabase
+        .from('wedding_budgets')
+        .insert([payload])
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      budgetForm.reset();
+      budgets = inserted ? [inserted, ...budgets] : budgets;
+      renderBudgets();
+      showNotice(notice, '預算項目已新增。', 'success');
+    } finally {
+      setLoading(spinner, false);
+    }
   }
 
   async function saveBudget(row) {
@@ -1020,7 +1047,6 @@ document.addEventListener('DOMContentLoaded', () => {
   budgetForm.addEventListener('submit', async (event) => {
     try {
       await createBudget(event);
-      showNotice(notice, '預算項目已新增。', 'success');
     } catch (error) {
       showNotice(notice, `預算新增失敗：${friendlyDbError(error)}`, 'error');
     }
@@ -1224,6 +1250,9 @@ function friendlyDbError(error) {
     || String(error.message || '').includes('hotel_needed')
     || String(error.message || '').includes('hotel_guest_count')
     || String(error.message || '').includes('special_need')
+    || String(error.message || '').includes('paid_amount')
+    || String(error.message || '').includes('payer')
+    || String(error.message || '').includes('final_payment_method')
     || String(error.message || '').includes('wishes')
     || String(error.message || '').includes('wedding_schedule')
     || String(error.message || '').includes('seating_backups')
