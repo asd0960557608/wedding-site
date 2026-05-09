@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -20,6 +20,7 @@
         <a href="seating.html">桌次查詢</a>
         <a href="guide.html">婚禮指引</a>
         <a href="gallery.html">婚紗相簿</a>
+        <a href="wishes.html">祝福留言</a>
         <a href="qa.html">Q&A</a>
         <a href="admin.html">後台</a>
       </div>
@@ -89,7 +90,7 @@
           <span class="eyebrow">Timeline</span>
           <h2>婚禮流程</h2>
         </div>
-        <div class="timeline">
+        <div class="timeline" data-schedule-list>
           <article class="timeline-item reveal">
             <div class="timeline-time">11:30</div>
             <div><h3>賓客報到</h3><p>接待桌開放，領取桌卡並拍攝迎賓合影。</p></div>
@@ -120,6 +121,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/schedule.js"></script>
   <script>
     function updateCountdown() {
       const distance = Math.max(WEDDING_DATE.getTime() - Date.now(), 0);
@@ -146,3 +148,4 @@
   </script>
 </body>
 </html>
+

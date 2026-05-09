@@ -28,10 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const seatingBoard = document.querySelector('#seatingBoard');
   const unassignedList = document.querySelector('#unassignedList');
   const unassignedCount = document.querySelector('[data-unassigned-count]');
+  const hotelTableBody = document.querySelector('#hotelTableBody');
+  const scheduleForm = document.querySelector('#scheduleForm');
+  const scheduleTableBody = document.querySelector('#scheduleTableBody');
+  const exportScheduleButton = document.querySelector('#exportSchedule');
+  const backupNameInput = document.querySelector('#backupName');
+  const createBackupButton = document.querySelector('#createBackup');
+  const backupTableBody = document.querySelector('#backupTableBody');
+  const budgetForm = document.querySelector('#budgetForm');
+  const budgetTableBody = document.querySelector('#budgetTableBody');
+  const vendorForm = document.querySelector('#vendorForm');
+  const vendorTableBody = document.querySelector('#vendorTableBody');
+  const wishTableBody = document.querySelector('#wishTableBody');
 
   if (!tableBody) return;
 
   let guests = [];
+  let schedules = [];
+  let backups = [];
+  let budgets = [];
+  let vendors = [];
+  let wishes = [];
   let tableNotes = readJson(TABLE_NOTES_KEY, {});
 
   tableCapacityInput.value = localStorage.getItem(TABLE_CAPACITY_KEY) || '10';
@@ -40,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginPanel.classList.add('hidden');
     appPanel.classList.remove('hidden');
     loadGuests();
+    loadAdminData();
   }
 
   function lockAdmin() {
@@ -100,6 +118,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function loadAdminData() {
+    if (!weddingSupabase) return;
+    await Promise.all([
+      loadSchedules(),
+      loadBackups(),
+      loadBudgets(),
+      loadVendors(),
+      loadWishes()
+    ]);
+  }
+
+  async function loadSchedules() {
+    try {
+      const { data, error } = await weddingSupabase
+        .from('wedding_schedule')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('time', { ascending: true });
+      if (error) throw error;
+      schedules = data || [];
+      renderSchedules();
+    } catch (error) {
+      renderTableMessage(scheduleTableBody, 4, `流程資料讀取失敗：${friendlyDbError(error)}`);
+    }
+  }
+
+  async function loadBackups() {
+    try {
+      const { data, error } = await weddingSupabase
+        .from('seating_backups')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      backups = data || [];
+      renderBackups();
+    } catch (error) {
+      renderTableMessage(backupTableBody, 4, `桌次備份讀取失敗：${friendlyDbError(error)}`);
+    }
+  }
+
+  async function loadBudgets() {
+    try {
+      const { data, error } = await weddingSupabase
+        .from('wedding_budgets')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      budgets = data || [];
+      renderBudgets();
+    } catch (error) {
+      renderTableMessage(budgetTableBody, 6, `預算資料讀取失敗：${friendlyDbError(error)}`);
+    }
+  }
+
+  async function loadVendors() {
+    try {
+      const { data, error } = await weddingSupabase
+        .from('wedding_vendors')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      vendors = data || [];
+      renderVendors();
+    } catch (error) {
+      renderTableMessage(vendorTableBody, 6, `廠商資料讀取失敗：${friendlyDbError(error)}`);
+    }
+  }
+
+  async function loadWishes() {
+    try {
+      const { data, error } = await weddingSupabase
+        .from('wishes')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      wishes = data || [];
+      renderWishes();
+    } catch (error) {
+      renderTableMessage(wishTableBody, 6, `祝福留言讀取失敗：${friendlyDbError(error)}`);
+    }
+  }
+
   function getFilteredGuests() {
     const keyword = String(searchInput.value || '').trim().toLowerCase();
     const selectedTable = tableFilter.value;
@@ -129,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDuplicateWarnings();
     renderGuests();
     renderSeatingBoard();
+    renderHotelNeeds();
   }
 
   function renderTableFilter() {
@@ -294,6 +395,129 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDragTargets();
   }
 
+  function renderHotelNeeds() {
+    const list = guests.filter((guest) => guest.hotel_needed === 'yes' || guest.hotel_needed === 'maybe');
+    if (!list.length) {
+      renderTableMessage(hotelTableBody, 7, '目前還沒有住宿需求。');
+      return;
+    }
+
+    hotelTableBody.innerHTML = list.map((guest) => `
+      <tr data-id="${guest.id}">
+        <td>${escapeHtml(guest.name)}</td>
+        <td>${escapeHtml(guest.phone || '')}</td>
+        <td>
+          <select data-hotel-field="hotel_needed">
+            <option value="yes" ${guest.hotel_needed === 'yes' ? 'selected' : ''}>需要</option>
+            <option value="maybe" ${guest.hotel_needed === 'maybe' ? 'selected' : ''}>未確定</option>
+            <option value="no" ${guest.hotel_needed === 'no' ? 'selected' : ''}>不需要</option>
+          </select>
+        </td>
+        <td><input data-hotel-field="hotel_guest_count" type="number" min="0" max="10" value="${Number(guest.hotel_guest_count || 0)}"></td>
+        <td>${getGuestCount(guest)}</td>
+        <td>${escapeHtml(guest.note || '')}</td>
+        <td><button class="btn ghost" data-save-hotel>儲存</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderSchedules() {
+    if (!scheduleTableBody) return;
+    if (!schedules.length) {
+      renderTableMessage(scheduleTableBody, 4, '還沒有流程。先新增一個，讓時間慢慢排成婚禮的樣子。');
+      return;
+    }
+
+    scheduleTableBody.innerHTML = schedules.map((item) => `
+      <tr data-id="${item.id}">
+        <td><input data-schedule-field="time" value="${escapeAttribute(item.time || '')}"></td>
+        <td><input data-schedule-field="title" value="${escapeAttribute(item.title || '')}"></td>
+        <td><input data-schedule-field="description" value="${escapeAttribute(item.description || '')}"></td>
+        <td><div class="row-actions"><button class="btn ghost" data-save-schedule>儲存</button><button class="btn danger" data-delete-schedule>刪除</button></div></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderBackups() {
+    if (!backupTableBody) return;
+    if (!backups.length) {
+      renderTableMessage(backupTableBody, 4, '還沒有桌次備份。排桌前先存一版，很值得。');
+      return;
+    }
+
+    backupTableBody.innerHTML = backups.map((backup) => `
+      <tr data-id="${backup.id}">
+        <td>${escapeHtml(backup.name || '')}</td>
+        <td>${formatDate(backup.created_at)}</td>
+        <td>${escapeHtml(backup.summary || '')}</td>
+        <td><div class="row-actions"><button class="btn ghost" data-restore-backup>還原</button><button class="btn danger" data-delete-backup>刪除</button></div></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderBudgets() {
+    if (!budgetTableBody) return;
+    const total = budgets.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const paid = budgets.filter((item) => item.payment_status === 'paid').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    setBudgetStat('total', total);
+    setBudgetStat('paid', paid);
+    setBudgetStat('unpaid', Math.max(total - paid, 0));
+
+    if (!budgets.length) {
+      renderTableMessage(budgetTableBody, 6, '還沒有預算紀錄。先把最大的幾筆放進來，心裡會踏實很多。');
+      return;
+    }
+
+    budgetTableBody.innerHTML = budgets.map((item) => `
+      <tr data-id="${item.id}">
+        <td><input data-budget-field="item_name" value="${escapeAttribute(item.item_name || '')}"></td>
+        <td><input data-budget-field="vendor_name" value="${escapeAttribute(item.vendor_name || '')}"></td>
+        <td><input data-budget-field="amount" type="number" min="0" value="${Number(item.amount || 0)}"></td>
+        <td><select data-budget-field="payment_status">${budgetStatusOptions(item.payment_status)}</select></td>
+        <td><input data-budget-field="due_date" type="date" value="${escapeAttribute(item.due_date || '')}"></td>
+        <td><div class="row-actions"><button class="btn ghost" data-save-budget>儲存</button><button class="btn danger" data-delete-budget>刪除</button></div></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderVendors() {
+    if (!vendorTableBody) return;
+    if (!vendors.length) {
+      renderTableMessage(vendorTableBody, 6, '還沒有廠商。先把場地、婚攝、主持放進來，之後找電話會快很多。');
+      return;
+    }
+
+    vendorTableBody.innerHTML = vendors.map((item) => `
+      <tr data-id="${item.id}">
+        <td><input data-vendor-field="category" value="${escapeAttribute(item.category || '')}"></td>
+        <td><input data-vendor-field="vendor_name" value="${escapeAttribute(item.vendor_name || '')}"></td>
+        <td><input data-vendor-field="contact_name" value="${escapeAttribute(item.contact_name || '')}"></td>
+        <td><input data-vendor-field="phone" value="${escapeAttribute(item.phone || '')}"></td>
+        <td><input data-vendor-field="note" value="${escapeAttribute(item.note || '')}"></td>
+        <td><div class="row-actions"><button class="btn ghost" data-save-vendor>儲存</button><button class="btn danger" data-delete-vendor>刪除</button></div></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderWishes() {
+    if (!wishTableBody) return;
+    if (!wishes.length) {
+      renderTableMessage(wishTableBody, 6, '還沒有祝福留言。等第一句話出現，這裡會變得很可愛。');
+      return;
+    }
+
+    wishTableBody.innerHTML = wishes.map((wish) => `
+      <tr data-id="${wish.id}">
+        <td>${escapeHtml(wish.name || '')}</td>
+        <td>${escapeHtml(wish.message || '')}</td>
+        <td>${wish.is_public ? '公開' : '悄悄話'}</td>
+        <td><select data-wish-field="is_approved"><option value="true" ${wish.is_approved ? 'selected' : ''}>通過</option><option value="false" ${!wish.is_approved ? 'selected' : ''}>隱藏</option></select></td>
+        <td>${formatDate(wish.created_at)}</td>
+        <td><div class="row-actions"><button class="btn ghost" data-save-wish>儲存</button><button class="btn danger" data-delete-wish>刪除</button></div></td>
+      </tr>
+    `).join('');
+  }
+
   function renderGuestCard(guest) {
     return `
       <article class="guest-card" draggable="true" data-guest-card="${guest.id}">
@@ -448,6 +672,162 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function saveHotel(row) {
+    const id = Number(row.dataset.id);
+    await updateGuest(id, {
+      hotel_needed: row.querySelector('[data-hotel-field="hotel_needed"]').value,
+      hotel_guest_count: Number(row.querySelector('[data-hotel-field="hotel_guest_count"]').value || 0)
+    });
+    showNotice(notice, '住宿需求已更新。', 'success');
+  }
+
+  async function createSchedule(event) {
+    event.preventDefault();
+    const formData = new FormData(scheduleForm);
+    const payload = {
+      time: String(formData.get('time') || '').trim(),
+      title: String(formData.get('title') || '').trim(),
+      description: String(formData.get('description') || '').trim(),
+      sort_order: schedules.length + 1
+    };
+    if (!payload.time || !payload.title) return;
+    const { error } = await weddingSupabase.from('wedding_schedule').insert([payload]);
+    if (error) throw error;
+    scheduleForm.reset();
+    await loadSchedules();
+  }
+
+  async function saveSchedule(row) {
+    const id = Number(row.dataset.id);
+    const patch = {
+      time: row.querySelector('[data-schedule-field="time"]').value.trim(),
+      title: row.querySelector('[data-schedule-field="title"]').value.trim(),
+      description: row.querySelector('[data-schedule-field="description"]').value.trim()
+    };
+    await updateRow('wedding_schedule', id, patch);
+    await loadSchedules();
+  }
+
+  async function createBackup() {
+    const name = backupNameInput.value.trim() || `桌次備份 ${new Date().toLocaleString('zh-TW')}`;
+    const assigned = guests.filter((guest) => guest.table_no);
+    const payload = {
+      name,
+      snapshot: assigned.map((guest) => ({ id: guest.id, name: guest.name, table_no: guest.table_no })),
+      summary: `${assigned.length} 筆已排桌，${getTableNames(assigned).length} 桌`
+    };
+    const { error } = await weddingSupabase.from('seating_backups').insert([payload]);
+    if (error) throw error;
+    backupNameInput.value = '';
+    await loadBackups();
+    showNotice(notice, '已儲存目前桌次版本。', 'success');
+  }
+
+  async function restoreBackup(row) {
+    const backup = backups.find((item) => item.id === Number(row.dataset.id));
+    if (!backup || !Array.isArray(backup.snapshot)) return;
+    if (!window.confirm(`確定要還原「${backup.name}」嗎？目前桌次會被這份備份覆蓋。`)) return;
+
+    setLoading(spinner, true);
+    try {
+      for (const item of backup.snapshot) {
+        await weddingSupabase.from('guests').update({ table_no: item.table_no || null }).eq('id', item.id);
+      }
+      await loadGuests();
+      showNotice(notice, '桌次已還原。', 'success');
+    } finally {
+      setLoading(spinner, false);
+    }
+  }
+
+  async function createBudget(event) {
+    event.preventDefault();
+    const data = new FormData(budgetForm);
+    const payload = {
+      item_name: String(data.get('item_name') || '').trim(),
+      vendor_name: String(data.get('vendor_name') || '').trim(),
+      amount: Number(data.get('amount') || 0),
+      payment_status: data.get('payment_status'),
+      due_date: data.get('due_date') || null
+    };
+    if (!payload.item_name) return;
+    const { error } = await weddingSupabase.from('wedding_budgets').insert([payload]);
+    if (error) throw error;
+    budgetForm.reset();
+    await loadBudgets();
+  }
+
+  async function saveBudget(row) {
+    const id = Number(row.dataset.id);
+    await updateRow('wedding_budgets', id, {
+      item_name: row.querySelector('[data-budget-field="item_name"]').value.trim(),
+      vendor_name: row.querySelector('[data-budget-field="vendor_name"]').value.trim(),
+      amount: Number(row.querySelector('[data-budget-field="amount"]').value || 0),
+      payment_status: row.querySelector('[data-budget-field="payment_status"]').value,
+      due_date: row.querySelector('[data-budget-field="due_date"]').value || null
+    });
+    await loadBudgets();
+  }
+
+  async function createVendor(event) {
+    event.preventDefault();
+    const data = new FormData(vendorForm);
+    const payload = {
+      category: String(data.get('category') || '').trim(),
+      vendor_name: String(data.get('vendor_name') || '').trim(),
+      contact_name: String(data.get('contact_name') || '').trim(),
+      phone: String(data.get('phone') || '').trim(),
+      note: String(data.get('note') || '').trim()
+    };
+    if (!payload.category || !payload.vendor_name) return;
+    const { error } = await weddingSupabase.from('wedding_vendors').insert([payload]);
+    if (error) throw error;
+    vendorForm.reset();
+    await loadVendors();
+  }
+
+  async function saveVendor(row) {
+    const id = Number(row.dataset.id);
+    await updateRow('wedding_vendors', id, {
+      category: row.querySelector('[data-vendor-field="category"]').value.trim(),
+      vendor_name: row.querySelector('[data-vendor-field="vendor_name"]').value.trim(),
+      contact_name: row.querySelector('[data-vendor-field="contact_name"]').value.trim(),
+      phone: row.querySelector('[data-vendor-field="phone"]').value.trim(),
+      note: row.querySelector('[data-vendor-field="note"]').value.trim()
+    });
+    await loadVendors();
+  }
+
+  async function saveWish(row) {
+    const id = Number(row.dataset.id);
+    await updateRow('wishes', id, {
+      is_approved: row.querySelector('[data-wish-field="is_approved"]').value === 'true'
+    });
+    await loadWishes();
+  }
+
+  async function updateRow(table, id, patch) {
+    const { error } = await weddingSupabase.from(table).update(patch).eq('id', id);
+    if (error) throw error;
+    showNotice(notice, '資料已更新。', 'success');
+  }
+
+  async function deleteRow(table, id, reloadFn, label = '資料') {
+    if (!window.confirm(`確定要刪除這筆${label}嗎？`)) return;
+    const { error } = await weddingSupabase.from(table).delete().eq('id', id);
+    if (error) throw error;
+    await reloadFn();
+    showNotice(notice, '已刪除。', 'success');
+  }
+
+  function exportScheduleCsv() {
+    const header = ['時間', '流程', '說明'];
+    const csv = [header, ...schedules.map((item) => [item.time || '', item.title || '', item.description || ''])]
+      .map((row) => row.map(csvCell).join(','))
+      .join('\n');
+    downloadFile('yu-134-schedule.csv', `\uFEFF${csv}`, 'text/csv;charset=utf-8');
+  }
+
   function getSelectedGuestIds() {
     return [...document.querySelectorAll('[data-select-guest]:checked')]
       .map((input) => Number(input.value))
@@ -508,7 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <h2>${escapeHtml(tableNo)} <small>${count} 人</small></h2>
           ${!isPublic && tableNotes[tableNo] ? `<p>${escapeHtml(tableNotes[tableNo])}</p>` : ''}
           <table>
-          <tr>${isPublic ? '<th>姓名</th><th>桌號</th>' : '<th>姓名</th><th>人數</th><th>餐點</th><th>分組</th><th>特殊需求</th><th>備註</th>'}</tr>
+          <tr>${isPublic ? '<th>姓名</th><th>桌號</th>' : '<th>姓名</th><th>人數</th><th>餐點</th><th>分組</th><th>特殊需求</th><th>住宿</th><th>備註</th>'}</tr>
             ${list.map((guest) => isPublic
               ? `<tr><td>${escapeHtml(guest.name)}</td><td>${escapeHtml(tableNo)}</td></tr>`
               : `<tr><td>${escapeHtml(guest.name)}</td><td>${getGuestCount(guest)}</td><td>${escapeHtml(guest.meal_type || '')}</td><td>${escapeHtml(guest.group_name || '')}</td><td>${escapeHtml(guest.special_need || '')}</td><td>${escapeHtml(formatHotelText(guest))}</td><td>${escapeHtml(guest.note || '')}</td></tr>`
@@ -578,6 +958,106 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  hotelTableBody.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-save-hotel]');
+    if (!button) return;
+    try {
+      await saveHotel(button.closest('tr'));
+    } catch (error) {
+      showNotice(notice, `住宿資料更新失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  scheduleForm.addEventListener('submit', async (event) => {
+    try {
+      await createSchedule(event);
+      showNotice(notice, '流程已新增。', 'success');
+    } catch (error) {
+      showNotice(notice, `流程新增失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  scheduleTableBody.addEventListener('click', async (event) => {
+    const row = event.target.closest('tr');
+    if (!row) return;
+    try {
+      if (event.target.closest('[data-save-schedule]')) await saveSchedule(row);
+      if (event.target.closest('[data-delete-schedule]')) await deleteRow('wedding_schedule', Number(row.dataset.id), loadSchedules, '流程');
+    } catch (error) {
+      showNotice(notice, `流程更新失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  createBackupButton.addEventListener('click', async () => {
+    try {
+      await createBackup();
+    } catch (error) {
+      showNotice(notice, `桌次備份失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  backupTableBody.addEventListener('click', async (event) => {
+    const row = event.target.closest('tr');
+    if (!row) return;
+    try {
+      if (event.target.closest('[data-restore-backup]')) await restoreBackup(row);
+      if (event.target.closest('[data-delete-backup]')) await deleteRow('seating_backups', Number(row.dataset.id), loadBackups, '桌次備份');
+    } catch (error) {
+      showNotice(notice, `桌次備份操作失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  budgetForm.addEventListener('submit', async (event) => {
+    try {
+      await createBudget(event);
+      showNotice(notice, '預算項目已新增。', 'success');
+    } catch (error) {
+      showNotice(notice, `預算新增失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  budgetTableBody.addEventListener('click', async (event) => {
+    const row = event.target.closest('tr');
+    if (!row) return;
+    try {
+      if (event.target.closest('[data-save-budget]')) await saveBudget(row);
+      if (event.target.closest('[data-delete-budget]')) await deleteRow('wedding_budgets', Number(row.dataset.id), loadBudgets, '預算');
+    } catch (error) {
+      showNotice(notice, `預算更新失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  vendorForm.addEventListener('submit', async (event) => {
+    try {
+      await createVendor(event);
+      showNotice(notice, '廠商已新增。', 'success');
+    } catch (error) {
+      showNotice(notice, `廠商新增失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  vendorTableBody.addEventListener('click', async (event) => {
+    const row = event.target.closest('tr');
+    if (!row) return;
+    try {
+      if (event.target.closest('[data-save-vendor]')) await saveVendor(row);
+      if (event.target.closest('[data-delete-vendor]')) await deleteRow('wedding_vendors', Number(row.dataset.id), loadVendors, '廠商');
+    } catch (error) {
+      showNotice(notice, `廠商更新失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
+  wishTableBody.addEventListener('click', async (event) => {
+    const row = event.target.closest('tr');
+    if (!row) return;
+    try {
+      if (event.target.closest('[data-save-wish]')) await saveWish(row);
+      if (event.target.closest('[data-delete-wish]')) await deleteRow('wishes', Number(row.dataset.id), loadWishes, '留言');
+    } catch (error) {
+      showNotice(notice, `留言更新失敗：${friendlyDbError(error)}`, 'error');
+    }
+  });
+
   seatingBoard.addEventListener('input', (event) => {
     const textarea = event.target.closest('[data-table-note]');
     if (!textarea) return;
@@ -603,6 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshButton.addEventListener('click', loadGuests);
   exportCsvButton.addEventListener('click', () => exportGuests('csv'));
   exportExcelButton.addEventListener('click', () => exportGuests('excel'));
+  exportScheduleButton.addEventListener('click', exportScheduleCsv);
   batchAssignButton.addEventListener('click', batchAssign);
   printSeatingButton.addEventListener('click', () => printSeating('full'));
   printPublicButton.addEventListener('click', () => printSeating('public'));
@@ -693,13 +1174,37 @@ function formatHotelText(guest) {
   return count > 0 ? `${label}，${count} 人` : label;
 }
 
+function budgetStatusOptions(current) {
+  const options = [
+    ['unpaid', '未付款'],
+    ['deposit', '已付訂金'],
+    ['paid', '已付清']
+  ];
+  return options.map(([value, label]) => `<option value="${value}" ${current === value ? 'selected' : ''}>${label}</option>`).join('');
+}
+
+function setBudgetStat(name, value) {
+  const item = document.querySelector(`[data-budget-stat="${name}"]`);
+  if (item) item.textContent = Number(value || 0).toLocaleString('zh-TW');
+}
+
+function renderTableMessage(body, colspan, message) {
+  if (!body) return;
+  body.innerHTML = `<tr><td colspan="${colspan}">${escapeHtml(message)}</td></tr>`;
+}
+
 function friendlyDbError(error) {
   if (String(error.message || '').includes('group_name')
     || String(error.message || '').includes('child_count')
     || String(error.message || '').includes('hotel_needed')
     || String(error.message || '').includes('hotel_guest_count')
-    || String(error.message || '').includes('special_need')) {
-    return `${error.message}。請先依 README 執行欄位 migration。`;
+    || String(error.message || '').includes('special_need')
+    || String(error.message || '').includes('wishes')
+    || String(error.message || '').includes('wedding_schedule')
+    || String(error.message || '').includes('seating_backups')
+    || String(error.message || '').includes('wedding_budgets')
+    || String(error.message || '').includes('wedding_vendors')) {
+    return `${error.message}。請先依 README 建立或更新需要的資料表。`;
   }
 
   return error.message;

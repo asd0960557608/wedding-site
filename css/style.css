@@ -431,6 +431,13 @@ h3 {
   gap: 18px;
 }
 
+.mini-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -756,6 +763,10 @@ textarea:focus {
   margin-bottom: 22px;
 }
 
+.stats-grid.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .stat-card {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1050,6 +1061,38 @@ textarea:focus {
   transform: rotate(45deg);
 }
 
+.wishes-heading {
+  margin-top: 58px;
+}
+
+.wish-wall {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wish-card {
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.wish-card p {
+  margin: 0;
+  color: var(--ink);
+}
+
+.wish-card strong {
+  color: var(--gold-dark);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -1150,9 +1193,11 @@ td select {
   .venue-highlight,
   .venue-facts,
   .form-grid,
+  .mini-form,
   .stats-grid,
   .seating-board,
-  .gallery-grid {
+  .gallery-grid,
+  .wish-wall {
     grid-template-columns: 1fr;
   }
 

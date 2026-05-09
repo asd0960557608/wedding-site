@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -20,6 +20,7 @@
         <a href="seating.html">桌次查詢</a>
         <a href="guide.html">婚禮指引</a>
         <a href="gallery.html">婚紗相簿</a>
+        <a href="wishes.html">祝福留言</a>
         <a href="qa.html">Q&A</a>
         <a class="active" href="admin.html">後台</a>
       </div>
@@ -109,6 +110,12 @@
           <div class="tabbar" role="tablist" aria-label="後台檢視">
             <button class="tab-button active" data-admin-view="list" type="button">名單列表</button>
             <button class="tab-button" data-admin-view="table" type="button">桌次視覺化</button>
+            <button class="tab-button" data-admin-view="hotel" type="button">住宿管理</button>
+            <button class="tab-button" data-admin-view="schedule" type="button">流程管理</button>
+            <button class="tab-button" data-admin-view="backup" type="button">桌次備份</button>
+            <button class="tab-button" data-admin-view="budget" type="button">預算付款</button>
+            <button class="tab-button" data-admin-view="vendor" type="button">廠商清單</button>
+            <button class="tab-button" data-admin-view="wish" type="button">祝福留言</button>
           </div>
 
           <div class="form-actions">
@@ -159,6 +166,112 @@
             </div>
             <div class="seating-board" id="seatingBoard"></div>
           </section>
+
+          <section class="admin-view" id="hotelView">
+            <div class="section-title">
+              <span class="eyebrow">Stay</span>
+              <h2>住宿需求管理</h2>
+              <p>先把想住、可能想住的人收好，等方案公布時就不用從訊息海裡撈人。</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>姓名</th><th>手機</th><th>住宿需求</th><th>住宿人數</th><th>同行人數</th><th>備註</th><th>操作</th></tr></thead>
+                <tbody id="hotelTableBody"><tr><td colspan="7">資料讀取中。</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="admin-view" id="scheduleView">
+            <div class="section-title">
+              <span class="eyebrow">Timeline</span>
+              <h2>婚禮流程管理</h2>
+              <p>流程常常會改，這裡可以慢慢調；確認後也能匯出給主持、婚顧和工作人員。</p>
+            </div>
+            <form class="mini-form" id="scheduleForm">
+              <input name="time" placeholder="時間，例如 12:20" required>
+              <input name="title" placeholder="流程名稱" required>
+              <input name="description" placeholder="說明">
+              <button class="btn" type="submit">新增流程</button>
+              <button class="btn secondary" id="exportSchedule" type="button">匯出流程 CSV</button>
+            </form>
+            <div class="table-wrap">
+              <table><thead><tr><th>時間</th><th>流程</th><th>說明</th><th>操作</th></tr></thead><tbody id="scheduleTableBody"></tbody></table>
+            </div>
+          </section>
+
+          <section class="admin-view" id="backupView">
+            <div class="section-title">
+              <span class="eyebrow">Backup</span>
+              <h2>桌次版本備份</h2>
+              <p>排桌最怕改到懷疑人生。先存一版，就有回頭路。</p>
+            </div>
+            <div class="admin-tools">
+              <div class="tool-box wide">
+                <label for="backupName">備份名稱</label>
+                <div class="inline-controls">
+                  <input id="backupName" type="text" placeholder="例如 第一次親友版">
+                  <button class="btn" id="createBackup" type="button">儲存目前桌次</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>名稱</th><th>建立時間</th><th>摘要</th><th>操作</th></tr></thead><tbody id="backupTableBody"></tbody></table>
+            </div>
+          </section>
+
+          <section class="admin-view" id="budgetView">
+            <div class="section-title">
+              <span class="eyebrow">Budget</span>
+              <h2>預算 / 付款紀錄</h2>
+              <p>錢的事不用浪漫，但要清楚。訂金、尾款、誰付過了，都放這裡。</p>
+            </div>
+            <form class="mini-form" id="budgetForm">
+              <input name="item_name" placeholder="項目，例如 婚攝" required>
+              <input name="vendor_name" placeholder="廠商">
+              <input name="amount" type="number" min="0" placeholder="金額">
+              <select name="payment_status"><option value="unpaid">未付款</option><option value="deposit">已付訂金</option><option value="paid">已付清</option></select>
+              <input name="due_date" type="date">
+              <button class="btn" type="submit">新增預算</button>
+            </form>
+            <div class="stats-grid compact">
+              <div class="stat-card"><span>總預算</span><strong data-budget-stat="total">0</strong></div>
+              <div class="stat-card"><span>已付清</span><strong data-budget-stat="paid">0</strong></div>
+              <div class="stat-card"><span>待付款</span><strong data-budget-stat="unpaid">0</strong></div>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>項目</th><th>廠商</th><th>金額</th><th>狀態</th><th>到期日</th><th>操作</th></tr></thead><tbody id="budgetTableBody"></tbody></table>
+            </div>
+          </section>
+
+          <section class="admin-view" id="vendorView">
+            <div class="section-title">
+              <span class="eyebrow">Vendors</span>
+              <h2>廠商清單</h2>
+              <p>攝影、主持、婚佈、飯店窗口，不要散落在不同聊天室，婚禮前會感謝現在的自己。</p>
+            </div>
+            <form class="mini-form" id="vendorForm">
+              <input name="category" placeholder="類別，例如 攝影" required>
+              <input name="vendor_name" placeholder="廠商名稱" required>
+              <input name="contact_name" placeholder="窗口">
+              <input name="phone" placeholder="電話">
+              <input name="note" placeholder="備註">
+              <button class="btn" type="submit">新增廠商</button>
+            </form>
+            <div class="table-wrap">
+              <table><thead><tr><th>類別</th><th>廠商</th><th>窗口</th><th>電話</th><th>備註</th><th>操作</th></tr></thead><tbody id="vendorTableBody"></tbody></table>
+            </div>
+          </section>
+
+          <section class="admin-view" id="wishView">
+            <div class="section-title">
+              <span class="eyebrow">Wishes</span>
+              <h2>祝福留言審核</h2>
+              <p>有些話適合公開，有些話適合只放在心裡。這裡可以決定哪些祝福出現在留言牆。</p>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>姓名</th><th>留言</th><th>公開</th><th>審核</th><th>建立時間</th><th>操作</th></tr></thead><tbody id="wishTableBody"></tbody></table>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -170,3 +283,4 @@
   <script src="js/admin.js"></script>
 </body>
 </html>
+
